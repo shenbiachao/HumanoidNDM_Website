@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#236b5e">
+  <title>HumanoidNDM | Real-World Adaptation for Humanoid Motion Tracking</title>
+  <meta name="description" content="HumanoidNDM closes the training-deployment gap of humanoid motion tracking through online, MoCap-free fine-tuning with a learned neural dynamics model. CoRL 2026.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="HumanoidNDM — Closing the Training-Deployment Gap">
+  <meta property="og:description" content="Online, MoCap-free adaptation of humanoid motion tracking. Explore the method and nine real-world demonstrations on Unitree G1.">
+  <meta property="og:image" content="https://pku-epic.github.io/HumanoidNDM/assets/images/teaser.webp">
+  <meta property="og:url" content="https://pku-epic.github.io/HumanoidNDM/">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://pku-epic.github.io/HumanoidNDM/">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <nav class="site-nav" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a class="wordmark" href="#top">Humanoid<span>NDM</span></a>
+      <div class="nav-links">
+        <a href="#abstract">Overview</a>
+        <a href="#method">Method</a>
+        <a href="#experiments">Experiments</a>
+        <a href="#BibTeX">BibTeX</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main">
+    <header class="publication-header container" id="top">
+      <p class="venue">Conference on Robot Learning <span>2026</span></p>
+      <h1><span class="project-name">HumanoidNDM<span class="visually-hidden">: </span></span><span class="paper-title">Closing the Training-Deployment Gap of Motion Tracking via Humanoid Neural Dynamics Model</span></h1>
+      <div class="authors" aria-label="Authors">
+        <span>Chao Chen<sup>1,3,*</sup></span>
+        <span>Zhenrong Wang<sup>2,3,4,*</sup></span>
+        <span>Jilong Wang<sup>3</sup></span>
+        <span>Yusen Feng<sup>1,3</sup></span>
+        <span>Jiangran Lyu<sup>1,3</sup></span>
+        <span>Li Yi<sup>3,5,†</sup></span>
+        <span>He Wang<sup>1,3,†</sup></span>
+      </div>
+      <div class="affiliations">
+        <span><sup>1</sup>CFCS, School of Computer Science, Peking University</span>
+        <span><sup>2</sup>Institute of Automation, Chinese Academy of Sciences</span>
+        <div><span><sup>3</sup>Galbot</span><span><sup>4</sup>Beijing Academy of Artificial Intelligence</span><span><sup>5</sup>Tsinghua University</span></div>
+      </div>
+      <p class="author-notes"><sup>*</sup> Equal contribution &nbsp; <sup>†</sup> Corresponding authors</p>
+      <div class="publication-links">
+        <a class="button button-dark" id="arxiv-link" href="https://arxiv.org/abs/2610.34126v1" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M8 13h8M8 17h5"/></svg>arXiv
+        </a>
+        <a class="button button-dark" id="code-link" href="https://github.com/shenbiachao/HumanoidNDM" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 6-6 6 6 6M16 6l6 6-6 6M14 4l-4 16"/></svg>Code
+        </a>
+      </div>
+    </header>
+
+    <section class="teaser-section" aria-label="Research overview">
+      <div class="container">
+        <p class="teaser-lead">From simulation-trained policies to <strong>real-world adaptability.</strong></p>
+        <figure class="teaser-figure">
+          <a class="zoomable" href="assets/images/teaser.webp" data-lightbox aria-label="Enlarge the six-task real-world comparison">
+            <img src="assets/images/teaser.webp" width="2400" height="1304" fetchpriority="high" alt="Six Unitree G1 tasks before and after fine-tuning: swallow balance with calf weights, arm swing with a hand weight, pen capping with a hand load, lateral raise with elastic bands, bowing with a damaged motor, and walking with a water bucket.">
+            <span class="zoom-hint" aria-hidden="true">View larger ↗</span>
+          </a>
+          <figcaption>Direct transfer (left two frames) vs. fine-tuning (right two) under real-world disturbances.</figcaption>
+        </figure>
+        <div class="research-facts" aria-label="Research highlights">
+          <div><strong>MoCap-free</strong><span>Learning from proprioception</span></div>
+          <div><strong>50–200</strong><span>Real-world trajectories per task</span></div>
+          <div><strong>6 tasks</strong><span>Validated on Unitree G1</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="abstract">
+      <div class="container prose">
+        <p class="eyebrow">The last mile of sim-to-real</p>
+        <h2>Abstract</h2>
+        <p>Humanoid robots have recently achieved remarkable success in motion tracking. However, during real-world deployment, robots inevitably encounter dynamics gaps—arising from either extra physical disturbances or inaccurate simulation modeling—resulting in a significant training-deployment gap. Therefore, effectively leveraging real-world data to fine-tune policies represents the crucial “last mile” for robust deployment.</p>
+        <p>To bridge this gap, we propose <strong>HumanoidNDM</strong>, an online fine-tuning framework for humanoid motion tracking driven by a real-world-trained neural dynamics model. First, in the data collection stage, we introduce a low-frequency reference perturbation method with an adaptive intensity mechanism, balancing deployment feasibility and exploration efficiency. Second, for the model training stage, we train a robust history-based, proprioceptive neural dynamics model in Euclidean space by incorporating differentiable forward kinematics, eliminating the reliance on costly motion capture systems. Finally, in the policy fine-tuning stage, we directly fine-tune the policy via backpropagated model gradients, achieving high data efficiency.</p>
+        <p>Through physical validation on the Unitree G1 robot, we demonstrate that HumanoidNDM enables rapid real-world adaptation to various perturbations, representing the first online, MoCap-free fine-tuning framework for humanoid tracking policies.</p>
+      </div>
+    </section>
+
+    <section class="section section-tinted" id="method">
+      <div class="container">
+        <p class="eyebrow">Collect. Model. Adapt.</p>
+        <h2>A real-world learning loop</h2>
+        <p class="section-intro">Start with a simulation-trained tracking policy. Collect real-world experience, learn the deployment dynamics, and improve the policy through differentiable rollouts.</p>
+        <figure class="pipeline-figure">
+          <a class="zoomable" href="assets/images/pipeline.webp" data-lightbox aria-label="Enlarge the HumanoidNDM method diagram">
+            <img src="assets/images/pipeline.webp" width="2400" height="1200" loading="lazy" alt="HumanoidNDM pipeline. A simulation-trained policy enters an iterative real-world loop: FENCE data collection with adaptive frequency-domain reference perturbations, history-based dynamics model training using proprioception and differentiable forward kinematics, and policy fine-tuning through model gradients.">
+            <span class="zoom-hint" aria-hidden="true">View larger ↗</span>
+          </a>
+        </figure>
+        <div class="method-steps">
+          <article class="method-step step-collection">
+            <span class="step-number">01 / DATA COLLECTION</span>
+            <h3>Explore smoothly with FENCE</h3>
+            <p>Low-frequency perturbations modify reference motions while the policy maintains closed-loop control. Policy neighborhood coverage guides adaptive perturbation intensity.</p>
+          </article>
+          <article class="method-step step-model">
+            <span class="step-number">02 / MODEL TRAINING</span>
+            <h3>Learn dynamics without MoCap</h3>
+            <p>A history-based neural dynamics model learns from onboard proprioception. Differentiable forward kinematics enables supervision in both configuration and Euclidean space.</p>
+          </article>
+          <article class="method-step step-policy">
+            <span class="step-number">03 / POLICY FINE-TUNING</span>
+            <h3>Fast adapt through model gradients</h3>
+            <p>Backpropagate tracking losses through multi-step model rollouts to fine-tune the policy directly, making effective use of limited real-world trajectories.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="experiments">
+      <div class="container">
+        <p class="eyebrow">On the physical robot</p>
+        <h2>Real-world adaptation</h2>
+        <p class="section-intro">Six tasks span dynamic whole-body motion and precise control. HumanoidNDM adapts to additional payloads and disturbances that are difficult to reproduce in simulation.</p>
+        <details class="playback-guide">
+          <summary>How to read the videos <span>Deployment → disturbance → online fine-tuning</span></summary>
+          <p>The task videos show the original behavior, the introduced disturbance, and online fine-tuning. FENCE exploration is shown at <strong>100× speed</strong>. Evaluation runs occur every 10 episodes; milestone evaluations at episodes 0, 50, 100, 150, and 200 are shown at <strong>1× speed</strong>, where applicable. Pen capping uses 50 trajectories; the other five primary tasks use 200. Use the player controls to enable audio or view full screen.</p>
+        </details>
+
+        <div class="video-grid">
+          <article class="video-card" id="balance">
+            <video controls muted playsinline preload="none" poster="assets/posters/balance-extra_weight.jpg" aria-label="Swallow balance adaptation with 1.5 kilogram weights on each ankle" aria-describedby="balance-desc"><source src="assets/videos/balance-extra_weight.mp4" type="video/mp4"><a href="assets/videos/balance-extra_weight.mp4">Download swallow balance video</a></video>
+            <div class="video-heading"><h3>Swallow balance</h3><span class="task-tag">Added payload</span></div>
+            <p id="balance-desc">With 1.5 kg on each ankle, the robot initially cannot fully raise its leg. After 200 episodes, it achieves stable single-leg balance.</p>
+            <p class="video-result"><span>Air time</span><strong>0.00 → 1.90 s</strong></p>
+          </article>
+          <article class="video-card" id="arm-swing">
+            <video controls muted playsinline preload="none" poster="assets/posters/swing_arm-extra_weight.jpg" aria-label="Arm swing adaptation with a 1.5 kilogram hand weight" aria-describedby="arm-swing-desc"><source src="assets/videos/swing_arm-extra_weight.mp4" type="video/mp4"><a href="assets/videos/swing_arm-extra_weight.mp4">Download arm swing video</a></video>
+            <div class="video-heading"><h3>Arm swing</h3><span class="task-tag">Added payload</span></div>
+            <p id="arm-swing-desc">A 1.5 kg load limits the left hand to chest height. After 200 episodes, the arm recovers its vertical reach.</p>
+            <p class="video-result"><span>Arm height</span><strong>0.98 → 1.40 m</strong></p>
+          </article>
+          <article class="video-card" id="pen-capping">
+            <video controls muted playsinline preload="none" poster="assets/posters/pen_capping-extra_weight.jpg" aria-label="Pen capping adaptation with a 0.75 kilogram hand load" aria-describedby="pen-capping-desc"><source src="assets/videos/pen_capping-extra_weight.mp4" type="video/mp4"><a href="assets/videos/pen_capping-extra_weight.mp4">Download pen capping video</a></video>
+            <div class="video-heading"><h3>Pen capping</h3><span class="task-tag">Precision control</span></div>
+            <p id="pen-capping-desc">A 0.75 kg load on the left hand causes misalignment. With just 50 episodes, the robot raises its hand and successfully caps the pen.</p>
+            <p class="video-result"><span>End-effector distance</span><strong>3.50 → 0.00 cm</strong></p>
+          </article>
+          <article class="video-card" id="lateral-raise">
+            <video controls muted playsinline preload="none" poster="assets/posters/lateral_raise-elastic_band.jpg" aria-label="Lateral raise adaptation under elastic-band resistance" aria-describedby="lateral-raise-desc"><source src="assets/videos/lateral_raise-elastic_band.mp4" type="video/mp4"><a href="assets/videos/lateral_raise-elastic_band.mp4">Download lateral raise video</a></video>
+            <div class="video-heading"><h3>Lateral raise</h3><span class="task-tag">Elastic resistance</span></div>
+            <p id="lateral-raise-desc">Elastic bands restrict arm motion and cause staggering. After 200 episodes, the robot raises its right arm higher and regains stability.</p>
+            <p class="video-result"><span>Arm height</span><strong>1.06 → 1.35 m</strong></p>
+          </article>
+          <article class="video-card" id="bowing">
+            <video controls muted playsinline preload="none" poster="assets/posters/bow-faulty_motors.jpg" aria-label="Bowing adaptation with damaged arm motors; enable audio to compare motor noise" aria-describedby="bowing-desc"><source src="assets/videos/bow-faulty_motors.mp4" type="video/mp4"><a href="assets/videos/bow-faulty_motors.mp4">Download bowing video</a></video>
+            <div class="video-heading"><h3>Bowing</h3><span class="task-tag">Damaged motors</span></div>
+            <p id="bowing-desc">Damaged arm motors produce noisy, inaccurate tracking. After 200 episodes, motion becomes smoother and motor noise decreases. Enable audio to hear the comparison.</p>
+            <p class="video-result"><span>Noise level</span><strong>73 → 55 dB</strong></p>
+          </article>
+          <article class="video-card" id="walking">
+            <video controls muted playsinline preload="none" poster="assets/posters/walk-water_bucket.jpg" aria-label="Walking adaptation while carrying a 2 kilogram water bucket" aria-describedby="walking-desc"><source src="assets/videos/walk-water_bucket.mp4" type="video/mp4"><a href="assets/videos/walk-water_bucket.mp4">Download walking video</a></video>
+            <div class="video-heading"><h3>Walking</h3><span class="task-tag">Moving payload</span></div>
+            <p id="walking-desc">A 2 kg water bucket causes staggering and trajectory deviation. After 200 episodes, the robot walks straighter without staggering.</p>
+            <p class="video-result"><span>Deviation angle</span><strong>38° → 5°</strong></p>
+          </article>
+        </div>
+        <p class="data-note">Task-specific results above compare Direct Transfer with HumanoidNDM using the mean over three trials. Full mean ± standard deviation values are reported below and in the paper.</p>
+
+        <details class="results-details">
+          <summary>View quantitative real-world results</summary>
+          <div class="table-scroll" tabindex="0" role="region" aria-label="Real-world results table, horizontally scrollable on small screens">
+            <table>
+              <caption>Task completion metrics, mean ± standard deviation over three trials.</caption>
+              <thead><tr><th scope="col">Task</th><th scope="col">Metric</th><th scope="col">Direct Transfer</th><th scope="col">HumanoidNDM</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">Swallow balance</th><td>Air time (s) ↑</td><td>0.00 ± 0.00</td><td class="ours">1.90 ± 0.61</td></tr>
+                <tr><th scope="row">Arm swing</th><td>Arm height (m) ↑</td><td>0.98 ± 0.00</td><td class="ours">1.40 ± 0.01</td></tr>
+                <tr><th scope="row">Pen capping</th><td>EE distance (cm) ↓</td><td>3.50 ± 0.00</td><td class="ours">0.00 ± 0.00</td></tr>
+                <tr><th scope="row">Lateral raise</th><td>Arm height (m) ↑</td><td>1.06 ± 0.07</td><td class="ours">1.35 ± 0.06</td></tr>
+                <tr><th scope="row">Bowing</th><td>Noise level (dB) ↓</td><td>73 ± 8</td><td class="ours">55 ± 5</td></tr>
+                <tr><th scope="row">Walking</th><td>Deviation angle (°) ↓</td><td>38 ± 17</td><td class="ours">5 ± 3</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <div class="subsection-heading">
+          <h3>Adapting as conditions change</h3>
+          <p>Additional demonstrations explore staged payload increases and multiple simultaneous disturbances.</p>
+        </div>
+        <div class="video-grid">
+          <article class="video-card">
+            <video controls muted playsinline preload="none" poster="assets/posters/swing_arm-continuous_adaptation.jpg" aria-label="Continuous arm swing adaptation to weights added at episodes zero, fifty, and one hundred" aria-describedby="continuous-desc"><source src="assets/videos/swing_arm-continuous_adaptation.mp4" type="video/mp4"><a href="assets/videos/swing_arm-continuous_adaptation.mp4">Download continuous adaptation video</a></video>
+            <div class="video-heading"><h3>Continuous adaptation</h3><span class="task-tag">Increasing loads</span></div>
+            <p id="continuous-desc">Weights are added to both hands at episodes 0, 50, and 100. Evaluations at episodes 50, 100, and 200 show the arm-swing policy adapting to the increasing loads.</p>
+          </article>
+          <article class="video-card">
+            <video controls muted playsinline preload="none" poster="assets/posters/dance-multi_disturbance.jpg" aria-label="Dancing adaptation with a water bottle and elastic-band disturbances" aria-describedby="dance-desc"><source src="assets/videos/dance-multi_disturbance.mp4" type="video/mp4"><a href="assets/videos/dance-multi_disturbance.mp4">Download dancing video</a></video>
+            <div class="video-heading"><h3>Dancing under disturbances</h3><span class="task-tag">Combined effects</span></div>
+            <p id="dance-desc">A 900 ml water bottle and elastic-band resistance disrupt arm motion and balance. After 200 episodes, the robot raises its arms and dances in place without staggering.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-tinted" id="exploration">
+      <div class="container">
+        <p class="eyebrow">Deployment-viable exploration</p>
+        <h2>Smoother exploration with FENCE</h2>
+        <p class="section-intro"><strong>F</strong>requency-domain <strong>E</strong>xploration via <strong>N</strong>eighborhood <strong>C</strong>overage <strong>E</strong>stimation perturbs reference motions at low frequencies, enabling data collection with less joint jitter and whole-body shaking.</p>
+        <div class="exploration-layout">
+          <figure>
+            <video controls muted playsinline preload="none" poster="assets/posters/exploration_comparison.jpg" aria-label="Real-world comparison of FENCE, no noise, action Ornstein-Uhlenbeck noise, observation Gaussian noise, and action Gaussian noise" aria-describedby="exploration-caption"><source src="assets/videos/exploration_comparison.mp4" type="video/mp4"><a href="assets/videos/exploration_comparison.mp4">Download exploration comparison</a></video>
+            <figcaption id="exploration-caption">Exploration methods on the lateral raise task. FENCE preserves smooth motion while collecting experience for adaptation.</figcaption>
+          </figure>
+          <div class="exploration-results">
+            <h3>Real-world collection smoothness</h3>
+            <p>Lower values indicate less jitter and shaking.</p>
+            <div class="table-scroll" tabindex="0" role="region" aria-label="Exploration smoothness results">
+              <table class="compact-table">
+                <caption class="visually-hidden">Collection smoothness, mean ± standard deviation.</caption>
+                <thead><tr><th scope="col">Method</th><th scope="col">Joint ↓</th><th scope="col">Roll-pitch ↓</th></tr></thead>
+                <tbody>
+                  <tr class="highlight-row"><th scope="row">FENCE (ours)</th><td>0.099 ± 0.018</td><td>0.126 ± 0.023</td></tr>
+                  <tr><th scope="row">Action Gaussian</th><td>1.275 ± 0.313</td><td>1.678 ± 0.455</td></tr>
+                  <tr><th scope="row">Action OU</th><td>0.707 ± 0.180</td><td>0.739 ± 0.210</td></tr>
+                  <tr><th scope="row">Obs. Gaussian</th><td>1.151 ± 0.315</td><td>1.033 ± 0.218</td></tr>
+                  <tr><th scope="row">No noise</th><td>0.076 ± 0.005</td><td>0.106 ± 0.008</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="data-note">FENCE approaches the stability of no-noise collection while providing active exploration.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="simulation">
+      <div class="container">
+        <p class="eyebrow">Controlled evaluation in MuJoCo</p>
+        <h2>Closing the dynamics gap</h2>
+        <p class="section-intro">Five motions and three disturbance types—inertial, contact, and actuation variations—yield 15 simulation settings. HumanoidNDM, ASAP, and RWM each use 200 deployment trajectories.</p>
+        <div class="simulation-highlights">
+          <p><strong>30% <span>↓</span></strong>link position error</p>
+          <p><strong>47% <span>↓</span></strong>link rotation error</p>
+          <div>Average reductions relative to Direct Transfer across all 15 simulation settings, as reported in the paper.</div>
+        </div>
+        <div class="plot-grid">
+          <figure><a class="zoomable" href="assets/images/simulation-position.webp" data-lightbox aria-label="Enlarge link position error plot"><img src="assets/images/simulation-position.webp" width="1200" height="932" loading="lazy" alt="Normalized link position tracking error during adaptation, comparing HumanoidNDM, RWM, ASAP, and an oracle baseline."></a><figcaption>Link position tracking error</figcaption></figure>
+          <figure><a class="zoomable" href="assets/images/simulation-rotation.webp" data-lightbox aria-label="Enlarge link rotation error plot"><img src="assets/images/simulation-rotation.webp" width="1200" height="932" loading="lazy" alt="Normalized link rotation tracking error during adaptation, comparing HumanoidNDM, RWM, ASAP, and an oracle baseline."></a><figcaption>Link rotation tracking error</figcaption></figure>
+        </div>
+        <p class="scope-note"><strong>Scope.</strong> The paper studies adaptation to time-invariant disturbances. The staged-load video illustrates successive adaptation as loads are changed; arbitrary continuously time-varying dynamics remain outside the current method’s validated scope.</p>
+      </div>
+    </section>
+
+    <section class="section section-tinted" id="BibTeX">
+      <div class="container citation-container">
+        <p class="eyebrow">Reference this work</p>
+        <h2>BibTeX</h2>
+        <div class="citation-toolbar"><span>HumanoidNDM · CoRL 2026</span><div><a href="assets/paper/citation.bib" download>Download .bib</a><button class="copy-button" id="copy-citation" type="button" hidden>Copy BibTeX</button></div></div>
+        <pre><code id="citation">@inproceedings{chen2026humanoidndm,
+  title     = {HumanoidNDM: Closing the Training-Deployment Gap of Motion
+               Tracking via Humanoid Neural Dynamics Model},
+  author    = {Chen, Chao and Wang, Zhenrong and Wang, Jilong and
+               Feng, Yusen and Lyu, Jiangran and Yi, Li and Wang, He},
+  booktitle = {Conference on Robot Learning},
+  year      = {2026},
+  url       = {https://pku-epic.github.io/HumanoidNDM}
+}</code></pre>
+        <p id="copy-status" class="copy-status" role="status" aria-live="polite"></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p><strong>HumanoidNDM</strong> <span>·</span> CoRL 2026</p>
+    <p>Website design inspired by <a href="https://www.lamda.nju.edu.cn/chenc/FTD.html" target="_blank" rel="noopener">Focus-Then-Decide</a> and <a href="https://nerfies.github.io/" target="_blank" rel="noopener">Nerfies</a>.</p>
+    <a href="#top" class="back-to-top">Back to top ↑</a>
+  </footer>
+
+  <dialog class="image-dialog" id="image-dialog" aria-label="Enlarged research figure">
+    <button class="dialog-close" type="button" aria-label="Close enlarged figure">×</button>
+    <img id="dialog-image" alt="">
+    <p class="dialog-caption"></p>
+  </dialog>
+</body>
+</html>

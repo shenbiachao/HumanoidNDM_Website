@@ -1,0 +1,47 @@
+[
+  {
+    "file": "balance-extra_weight.mp4",
+    "duration": 107.37,
+    "bytes": 17643260
+  },
+  {
+    "file": "bow-faulty_motors.mp4",
+    "duration": 117.238,
+    "bytes": 15495120
+  },
+  {
+    "file": "dance-multi_disturbance.mp4",
+    "duration": 100.659,
+    "bytes": 15758921
+  },
+  {
+    "file": "exploration_comparison.mp4",
+    "duration": 16.346,
+    "bytes": 3995149
+  },
+  {
+    "file": "lateral_raise-elastic_band.mp4",
+    "duration": 134.374,
+    "bytes": 16563529
+  },
+  {
+    "file": "pen_capping-extra_weight.mp4",
+    "duration": 100.102,
+    "bytes": 9464975
+  },
+  {
+    "file": "swing_arm-continuous_adaptation.mp4",
+    "duration": 131.983,
+    "bytes": 18687106
+  },
+  {
+    "file": "swing_arm-extra_weight.mp4",
+    "duration": 112.71,
+    "bytes": 15077876
+  },
+  {
+    "file": "walk-water_bucket.mp4",
+    "duration": 109.018,
+    "bytes": 10998589
+  }
+]
